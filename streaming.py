@@ -10,7 +10,6 @@ def on_message(ws, message):
     global batch
     data = json.loads(message)
 
-    # Filter out subscription confirmation or any unwanted messages
     if "result" in data and data["result"] is None:
         print("Ignoring subscription message.")
         return
