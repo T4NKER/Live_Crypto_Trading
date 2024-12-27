@@ -1,10 +1,25 @@
 import websocket
 import json
+from data_store.streaming_data_spark import write_to_parquet
+from datetime import datetime
+
+batch = []
 
 
 def on_message(ws, message):
+    global batch
     data = json.loads(message)
-    print(f"Received message: {data}")
+
+    # Filter out subscription confirmation or any unwanted messages
+    if "result" in data and data["result"] is None:
+        print("Ignoring subscription message.")
+        return
+
+    batch.append(data)
+
+    if len(batch) >= 100:
+        write_to_parquet(batch, "streaming_data/streaming_data.parquet")
+        batch = []
 
 
 def on_error(ws, error):
