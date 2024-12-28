@@ -1,6 +1,6 @@
-import websocket
 import json
-from data_store.streaming_data_spark import write_to_parquet
+from websocket import WebSocketApp
+from data_store.streaming_data_spark import write_to_db
 from datetime import datetime
 
 batch = []
@@ -17,7 +17,7 @@ def on_message(ws, message):
     batch.append(data)
 
     if len(batch) >= 100:
-        write_to_parquet(batch, "streaming_data/streaming_data.parquet")
+        write_to_db(batch)
         batch = []
 
 
@@ -37,7 +37,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     url = "wss://stream.binance.com:9443/ws"
-    ws = websocket.WebSocketApp(
+    ws = WebSocketApp(
         url,
         on_message=on_message,
         on_error=on_error,
